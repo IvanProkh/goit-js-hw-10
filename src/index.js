@@ -32,13 +32,16 @@
 
 import './css/styles.css';
 import Notiflix from 'notiflix';
-import fetchCountries from './fetchCountries';
 import debounce from 'lodash.debounce';
+
+import fetchCountries from './fetchCountries';
+
+// import { fetchCountries } from './fetchCountries';
 
 const refs = {
   searchBox: document.querySelector('#search-box'),
-  countryList: document.querySelector('#country-list'),
-  countryInfo: document.querySelector('#country-info'),
+  countryList: document.querySelector('.country-list'),
+  countryInfo: document.querySelector('.country-info'),
 };
 const DEBOUNCE_DELAY = 300;
 
@@ -53,21 +56,70 @@ function handleInput(e) {
       .then(data => {
         console.log('~ data', data);
 
-        if (data.length > 0) {
+        if (data.length === 1) {
+          renderInfo(data);
+        } else if (data.length > 1 && data.length < 10) {
           renderList(data);
-        } else {
-          renderError();
         }
       })
       .catch(err => {
         console.log('~ err', err);
         renderError();
       });
-  } else {
-    refs.countryList.innerHTML = '';
-    refs.countryInfo.innerHTML = '';
   }
 }
+
+function renderList(data) {
+  refs.countryInfo.innerHTML = '';
+  refs.countryList.innerHTML = '';
+  console.log('~ data', data.name);
+  console.log('~ data', data.flag);
+
+  data.forEach(item => {
+    const countryItem = document.createElement('li');
+    countryItem.classList.add('country-item');
+
+    refs.countryList.innerHTML = `
+              <div class="flag">
+                  <img src="${item.flag}" alt="${item.name}">
+              </div>
+              <div class="country-info">
+                  <h3 class="country-name">${item.name}</h3>
+                  <p class="capital">Capital: ${item.capital}</p>
+                  <p class="population">Population: ${item.population}</p>
+                  <p class="languages">Languages: ${item.languages}</p>
+              </div>
+          `;
+    refs.countryList.appendChild(countryItem);
+  });
+}
+
+// function renderInfo(data) {
+//   refs.countryList.innerHTML = '';
+//   refs.countryInfo.innerHTML = `
+//         <div class="flag">
+//             <img src="${data.flag}" alt="${data.name}">
+//         </div>
+//         <div class="country-info">
+//             <h3 class="country-name">${data.name}</h3>
+//             <p class="capital">Capital: ${data.capital}</p>
+//             <p class="population">Population: ${data.population}</p>
+//             <p class="languages">Languages: ${data.languages}</p>
+//         </div>
+//     `;
+// }
+
+function renderError() {
+  refs.countryInfo.innerHTML = '';
+  refs.countryList.innerHTML = '';
+  Notiflix.Notify.Failure('Oops, there is no country with that name');
+}
+
+
+
+
+
+
 
 // function debounce(func, delay) {
 //   let timeoutId;
@@ -81,47 +133,3 @@ function handleInput(e) {
 //     }, delay);
 //   };
 // }
-
-function renderError() {
-  refs.countryInfo.innerHTML = '';
-  refs.countryList.innerHTML = '';
-  Notiflix.Notify.Failure('Oops, there is no country with that name');
-}
-
-function renderList(data) {
-  refs.countryInfo.innerHTML = '';
-  refs.countryList.innerHTML = '';
-  data.forEach(item => {
-    const countryItem = document.createElement('li');
-    countryItem.classList.add('country-item');
-    countryItem.innerHTML = `
-                <div class="flag">
-                    <img src="${item.flag}" alt="${item.name}">
-                </div>
-                <div class="country-info">
-                    <h3 class="country-name">${item.name}</h3>
-                    <p class="capital">Capital: ${item.capital}</p>
-                    <p class="population">Population: ${item.population}</p>
-                    <p class="languages">Languages: ${item.languages}</p>
-                </div>
-            `;
-    refs.countryList.appendChild(countryItem);
-  });
-}
-
-function renderInfo(data) {
-  refs.countryList.innerHTML = '';
-  refs.countryInfo.innerHTML = `
-        <div class="flag">
-            <img src="${data.flag}" alt="${data.name}">
-        </div>
-        <div class="country-info">
-            <h3 class="country-name">${data.name}</h3>
-            <p class="capital">Capital: ${data.capital}</p>
-            <p class="population">Population: ${data.population}</p>
-            <p class="languages">Languages: ${data.languages}</p>
-        </div>
-    `;
-}
-
-// Notiflix.Notify.success('Sol lucet omnibus');
