@@ -51,51 +51,65 @@ function handleInput(e) {
   const inputValue = e.target.value;
   console.log('~ inputValue', inputValue);
 
-  if (inputValue.trim().length > 0) {
+
+  if (inputValue.trim().toLowerCase().length > 0) {
+
+      
     fetchCountries(inputValue)
       .then(data => {
         console.log('~ data', data);
 
         if (data.length === 1) {
-          renderInfo(data);
-        } else if (data.length > 1 && data.length < 10) {
+          // renderInfo(data);
+          console.log('один елемент')
+        } else if (data.length > 1 && data.length <= 10) {
           renderList(data);
+          console.log('больше одного елемента')
+        } else if (data.length > 10){
+          Notiflix.Notify.info('Too many matches found. Please enter a more specific name.');
+        } else if (data.length === 0) {
+          console.log('нет елементов', data.length)
+        renderEmpty();
         }
       })
       .catch(err => {
         console.log('~ err', err);
         renderError();
       });
+    }
   }
-}
+
 
 function renderList(data) {
-  refs.countryInfo.innerHTML = '';
-  refs.countryList.innerHTML = '';
-  console.log('~ data', data.name);
-  console.log('~ data', data.flag);
+  // refs.countryInfo.innerHTML = '';
+  // refs.countryList.innerHTML = '';
+  console.log('~ data', data);
 
   data.forEach(item => {
-    const countryItem = document.createElement('li');
-    countryItem.classList.add('country-item');
+    // const countryItem = document.createElement('li');
+    // countryItem.classList.add('country-item');
+    // refs.countryList.appendChild(countryItem);
+    // refs.countryList.insertAdjacentHTML(
+    //   'beforeend', new)
 
-    refs.countryList.innerHTML = `
+    // refs.countryList.innerHTML = `
+    refs.countryList.insertAdjacentHTML(
+      'beforeend', `
               <div class="flag">
-                  <img src="${item.flag}" alt="${item.name}">
+                  <img src="${item.flags.png}" alt="${item.name.common}">
               </div>
               <div class="country-info">
-                  <h3 class="country-name">${item.name}</h3>
+                  <h3 class="country-name">${item.name.official}</h3>
                   <p class="capital">Capital: ${item.capital}</p>
                   <p class="population">Population: ${item.population}</p>
-                  <p class="languages">Languages: ${item.languages}</p>
+                  <p class="languages">Languages: ${Object.values(item.languages)}</p>
               </div>
-          `;
-    refs.countryList.appendChild(countryItem);
+          `);
+    // refs.countryList.appendChild(countryItem);
+    
   });
 }
-
 // function renderInfo(data) {
-//   refs.countryList.innerHTML = '';
 //   refs.countryInfo.innerHTML = `
 //         <div class="flag">
 //             <img src="${data.flag}" alt="${data.name}">
@@ -112,10 +126,13 @@ function renderList(data) {
 function renderError() {
   refs.countryInfo.innerHTML = '';
   refs.countryList.innerHTML = '';
-  Notiflix.Notify.Failure('Oops, there is no country with that name');
+  Notiflix.Notify.failure('Oops, there is no country with that name');
 }
 
-
+function renderEmpty() {
+  refs.countryInfo.innerHTML = '';
+  refs.countryList.innerHTML = '';
+}
 
 
 
