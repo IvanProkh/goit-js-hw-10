@@ -45,9 +45,9 @@ const refs = {
 };
 const DEBOUNCE_DELAY = 300;
 
-refs.searchBox.addEventListener('input', debounce(handleInput, DEBOUNCE_DELAY));
+refs.searchBox.addEventListener('input', debounce(onHandleInput, DEBOUNCE_DELAY));
 
-function handleInput(e) {
+function onHandleInput(e) {
   const inputValue = e.target.value;
   console.log('~ inputValue', inputValue);
 
@@ -57,70 +57,84 @@ function handleInput(e) {
       
     fetchCountries(inputValue)
       .then(data => {
-        console.log('~ data', data);
+        console.log('начальная дата', data);
 
-        if (data.length === 1) {
-          // renderInfo(data);
+         if (data.length === 1) {
+          renderFullInfo(data);
           console.log('один елемент')
         } else if (data.length > 1 && data.length <= 10) {
           renderList(data);
           console.log('больше одного елемента')
-        } else if (data.length > 10){
+        } else {
           Notiflix.Notify.info('Too many matches found. Please enter a more specific name.');
-        } else if (data.length === 0) {
-          console.log('нет елементов', data.length)
-        renderEmpty();
-        }
+        } 
       })
       .catch(err => {
         console.log('~ err', err);
         renderError();
       });
+    } else if(inputValue.length === 0) {
+      console.log('нет елементов')
+      renderEmpty();
     }
   }
 
-
 function renderList(data) {
-  // refs.countryInfo.innerHTML = '';
-  // refs.countryList.innerHTML = '';
-  console.log('~ data', data);
+  refs.countryInfo.innerHTML = '';
+  refs.countryList.innerHTML = '';
+  console.log('список стран', data);
 
   data.forEach(item => {
-    // const countryItem = document.createElement('li');
-    // countryItem.classList.add('country-item');
-    // refs.countryList.appendChild(countryItem);
-    // refs.countryList.insertAdjacentHTML(
-    //   'beforeend', new)
+    const { name, flags } = item;
 
-    // refs.countryList.innerHTML = `
-    refs.countryList.insertAdjacentHTML(
-      'beforeend', `
-              <div class="flag">
-                  <img src="${item.flags.png}" alt="${item.name.common}">
-              </div>
-              <div class="country-info">
-                  <h3 class="country-name">${item.name.official}</h3>
-                  <p class="capital">Capital: ${item.capital}</p>
-                  <p class="population">Population: ${item.population}</p>
-                  <p class="languages">Languages: ${Object.values(item.languages)}</p>
-              </div>
-          `);
-    // refs.countryList.appendChild(countryItem);
-    
+    const countryItem = document.createElement('li');
+    countryItem.classList.add('country-item');
+    countryItem.innerHTML = `
+    <div class="flag">
+      <img src="${flags.png}" alt="${name.official}">
+    </div>
+    <div class="country-name">${name.official}</div>
+    `;
+    refs.countryList.appendChild(countryItem);
+  
   });
 }
-// function renderInfo(data) {
-//   refs.countryInfo.innerHTML = `
-//         <div class="flag">
-//             <img src="${data.flag}" alt="${data.name}">
-//         </div>
-//         <div class="country-info">
-//             <h3 class="country-name">${data.name}</h3>
-//             <p class="capital">Capital: ${data.capital}</p>
-//             <p class="population">Population: ${data.population}</p>
-//             <p class="languages">Languages: ${data.languages}</p>
-//         </div>
-//     `;
+
+function renderFullInfo(data) {
+  console.log('одна страна', data);
+  refs.countryList.innerHTML = '';
+  const { name, flags, capital, population, languages } = data[0];
+  const { official } = name;
+  const { png } = flags;
+  refs.countryInfo.innerHTML = `
+  <div class="country-item">
+    <div class="flag">
+      <img src="${png}" alt="${official}">
+    </div>
+    <div class="country-name">${official}</div>
+  </div>
+  <div class="country-capital"><span class="country-element">Capital:</span> ${capital}</div>
+  <div class="country-population"><span class="country-element">Population:</span> ${population}</div>
+  <div class="country-languages"><span class="country-element">Languages:</span> ${Object.values(languages).map(item => item).join(', ')}</div>
+  `;
+}
+
+
+// ${languages.map(item => item.name).join(', ')
+
+
+  // refs.countryInfo.insertAdjacentHTML(
+  //   'beforeend',`
+  //       <div class="flag">
+  //           <img src="${data.flags.png}" alt="${data.name.official}">
+  //       </div>
+  //       <div class="country-info">
+  //           <h3 class="country-name">${data.name.official}</h3>
+  //           <p class="capital">Capital: ${data.capital}</p>
+  //           <p class="population">Population: ${data.population}</p>
+  //           <p class="languages">Languages: ${Object.values(data.languages)}</p>
+  //       </div>
+  //   `);
 // }
 
 function renderError() {
