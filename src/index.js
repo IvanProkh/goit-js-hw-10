@@ -20,14 +20,14 @@ function onHandleInput(e) {
 
     fetchCountries(inputValue)
       .then(data => {
-        console.log('начальная дата', data);
+        // console.log('начальный масив', data);
 
           if (data.length === 1) {
           renderOneCountry(data);
-          // console.log('один елемент')
+          // console.log('один элемент')
         } else if (data.length > 1 && data.length <= 10) {
           renderList(data);
-          // console.log('больше одного елемента')
+          // console.log('до десяти элементов')
         } else {
           Notiflix.Notify.info('Too many matches found. Please enter a more specific name.');
         } 
